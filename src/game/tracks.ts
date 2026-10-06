@@ -1,0 +1,255 @@
+import type { TrackPoint, TrackSpec } from './types'
+import { TAU } from './utils'
+
+/**
+ * Circuits are generated from a radius profile: one radius per evenly spaced
+ * angle. That guarantees a simple (non self-intersecting) closed loop while
+ * still letting each track have straights, hairpins and flowing sweepers.
+ */
+function ring(
+  radii: number[],
+  rot: number,
+  scaleX: number,
+  scaleZ: number,
+  /** Which radius profile entry becomes control point 0, i.e. the start line. */
+  startIndex = 0,
+): TrackPoint[] {
+  const n = radii.length
+  const order = [...radii.slice(startIndex), ...radii.slice(0, startIndex)]
+  const pts: TrackPoint[] = []
+  for (let i = 0; i < n; i++) {
+    const a = rot + (i / n) * TAU
+    const r = order[i]
+    pts.push({ x: Math.cos(a) * r * scaleX, z: Math.sin(a) * r * scaleZ })
+  }
+  return pts
+}
+
+export const TRACKS: TrackSpec[] = [
+  {
+    id: 'sunset-bay',
+    name: 'Sunset Bay Circuit',
+    location: 'Bayfront, Cala Dorada',
+    blurb: 'A flowing harbour circuit of long sweepers. Wide, forgiving and fast.',
+    laps: 3,
+    difficulty: 1,
+    reward: 2000,
+    roadWidth: 17,
+    traffic: 4,
+    theme: {
+      skyTop: '#1d2c66',
+      skyBottom: '#ff9152',
+      fog: '#e08a63',
+      fogNear: 120,
+      fogFar: 780,
+      ground: '#3d6b46',
+      groundAccent: '#587f52',
+      road: '#3a3d45',
+      edge: '#e8e9ee',
+      line: '#f2d24a',
+      barrier: '#d8dbe2',
+      barrierTop: '#c0392b',
+      sunColor: '#ffb26b',
+      sunIntensity: 2.4,
+      sunPosition: [-160, 70, 200],
+      ambient: 0.5,
+      ambientColor: '#ffd9b0',
+      hemiSky: '#ffb98a',
+      hemiGround: '#2f4a38',
+      scenery: 'city',
+      night: false,
+      sky: 'sunset',
+      neon: null,
+    },
+    // `startIndex` moves the start/finish line onto a straight — the value is
+    // picked by scripts/startline.ts, which scores every possible rotation.
+    points: ring(
+      [182, 176, 148, 116, 138, 174, 196, 188, 158, 128, 122, 152, 180, 190],
+      0.35,
+      1.16,
+      1,
+      9,
+    ),
+  },
+  {
+    id: 'redline',
+    name: 'Redline Speedway',
+    location: 'Mesa Flats, Nevada',
+    blurb: 'Flat-out oval with two brutal hairpins. Slipstreaming is everything here.',
+    laps: 2,
+    difficulty: 2,
+    reward: 3400,
+    roadWidth: 19,
+    traffic: 5,
+    theme: {
+      skyTop: '#2b74c8',
+      skyBottom: '#d8ecff',
+      fog: '#c3dcf2',
+      fogNear: 200,
+      fogFar: 1000,
+      ground: '#4e7a48',
+      groundAccent: '#6d9358',
+      road: '#43464d',
+      edge: '#f0f1f4',
+      line: '#ffffff',
+      barrier: '#e2e4e9',
+      barrierTop: '#2f5fd0',
+      sunColor: '#fff3d6',
+      sunIntensity: 2.9,
+      sunPosition: [240, 130, -120],
+      ambient: 0.62,
+      ambientColor: '#dbe9ff',
+      hemiSky: '#a9cdff',
+      hemiGround: '#48603c',
+      scenery: 'city',
+      night: false,
+      sky: 'day',
+      neon: null,
+    },
+    points: ring(
+      [236, 228, 178, 232, 226, 214, 148, 218, 230, 224, 206, 228, 234, 222, 196, 228],
+      -0.4,
+      1.6,
+      1.05,
+      4,
+    ),
+  },
+  {
+    id: 'neon',
+    name: 'Neon District',
+    location: 'Sector 9, Shinjuku Grid',
+    blurb: 'Rain-slick downtown streets. Walls everywhere, no room for error.',
+    laps: 4,
+    difficulty: 3,
+    reward: 5600,
+    roadWidth: 15,
+    traffic: 6,
+    theme: {
+      skyTop: '#04050e',
+      skyBottom: '#1d0a33',
+      fog: '#150a26',
+      fogNear: 60,
+      fogFar: 460,
+      ground: '#0c0e16',
+      groundAccent: '#151a26',
+      road: '#1b1e2a',
+      edge: '#22d3ee',
+      line: '#f0abfc',
+      barrier: '#181b28',
+      barrierTop: '#ff2fd0',
+      sunColor: '#8ea2ff',
+      sunIntensity: 0.5,
+      sunPosition: [-80, 120, 60],
+      ambient: 0.42,
+      ambientColor: '#5b4b8a',
+      hemiSky: '#2a1b4d',
+      hemiGround: '#080910',
+      scenery: 'neon',
+      night: true,
+      sky: 'night',
+      neon: '#ff2fd0',
+    },
+    points: ring(
+      [156, 134, 108, 90, 94, 106, 126, 146, 154, 138, 112, 92, 96, 108, 128, 148],
+      0.9,
+      1.05,
+      1.1,
+      13,
+    ),
+  },
+  {
+    id: 'dune',
+    name: 'Dune Valley',
+    location: 'Erg Namib, Sector IV',
+    blurb: 'Sand-blasted valley run. Huge elevation-free sweeps and blind crests.',
+    laps: 3,
+    difficulty: 4,
+    reward: 8600,
+    roadWidth: 17,
+    traffic: 6,
+    theme: {
+      skyTop: '#4b93cf',
+      skyBottom: '#f7e2b4',
+      fog: '#e8d3a5',
+      fogNear: 150,
+      fogFar: 900,
+      ground: '#d6b478',
+      groundAccent: '#c19a5c',
+      road: '#6d6459',
+      edge: '#f4ecd8',
+      line: '#f8e08a',
+      barrier: '#e8dcc0',
+      barrierTop: '#b4622a',
+      sunColor: '#ffe0a8',
+      sunIntensity: 3,
+      sunPosition: [-200, 150, -140],
+      ambient: 0.6,
+      ambientColor: '#ffe6bd',
+      hemiSky: '#f6dfae',
+      hemiGround: '#8a6c40',
+      scenery: 'desert',
+      night: false,
+      sky: 'day',
+      neon: null,
+    },
+    points: ring(
+      [212, 198, 172, 146, 158, 192, 214, 202, 178, 152, 164, 198, 216, 206, 176, 142, 156, 188],
+      -0.15,
+      1.32,
+      0.96,
+      4,
+    ),
+  },
+  {
+    id: 'alpine',
+    name: 'Alpine Frost Pass',
+    location: 'Col de Glace, Val Blanc',
+    blurb: 'Frozen mountain switchbacks. Low grip, blind corners, no mercy.',
+    laps: 4,
+    difficulty: 5,
+    reward: 12000,
+    roadWidth: 14,
+    traffic: 7,
+    theme: {
+      skyTop: '#8ea9c6',
+      skyBottom: '#e9f1f9',
+      fog: '#dce8f3',
+      fogNear: 70,
+      fogFar: 560,
+      ground: '#eef4fa',
+      groundAccent: '#cddced',
+      road: '#4a505a',
+      edge: '#ffffff',
+      line: '#7fd3ff',
+      barrier: '#f4f8fc',
+      barrierTop: '#d34b4b',
+      sunColor: '#ffffff',
+      sunIntensity: 1.5,
+      sunPosition: [140, 90, -180],
+      ambient: 0.75,
+      ambientColor: '#e6f0ff',
+      hemiSky: '#eaf2fb',
+      hemiGround: '#b9c8d8',
+      scenery: 'alpine',
+      night: false,
+      sky: 'overcast',
+      neon: null,
+    },
+    points: ring(
+      [178, 170, 150, 120, 96, 88, 100, 126, 154, 168, 176, 160, 132, 106, 92, 100, 122, 152],
+      1.6,
+      1.08,
+      1.02,
+      9,
+    ),
+  },
+]
+
+export function getTrack(id: string): TrackSpec {
+  return TRACKS.find((t) => t.id === id) ?? TRACKS[0]
+}
+
+export function trackIndex(id: string): number {
+  const i = TRACKS.findIndex((t) => t.id === id)
+  return i < 0 ? 0 : i
+}
